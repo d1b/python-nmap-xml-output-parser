@@ -6,6 +6,8 @@ from sys import exit
 def main(file_name):
 	doc = etree.parse(file_name)
 	for x in doc.xpath("//host[ports/port[state[@state='open']]]"):
+		for hostname in x.xpath("hostnames/hostname/@name"):
+			print hostname,
 		for addr in x.xpath("address/@addr"):
 			print addr
 		for open_p in x.xpath("ports/port[state[@state='open']]"):
