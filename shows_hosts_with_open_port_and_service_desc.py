@@ -23,7 +23,7 @@ def parse_opts():
 	if options.file_name is None:
 		print "you MUST enter a file name, see -h"
 		exit(1)
-	main(options.file_name)
+	return options.file_name
 
 if __name__ == "__main__":
-	parse_opts()
+	main( parse_opts() )
