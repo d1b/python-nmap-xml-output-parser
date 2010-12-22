@@ -38,7 +38,15 @@ class nmap_xml_to_sqlite:
 		protocol text, scan_time datetime, name text,
 		servicefp text, version text,
 		unique(protocol, port, addr, scan_time))""")
-	def insert_host_into_db(self, addr,hostname, time_of_scan):
+		self.cursor.execute("""create table if not exists scan
+		(scan_time datetime, args text, unique (scan_time, args))""")
+
+	def insert_scan_into_db(self, time_of_scan, args):
+		""" insert a scan into the database """
+		sql_statement = """insert or ignore into scan (scan_time, args) VALUES (?, ?) """
+		self.cursor.execute(sql_statement, (time_of_scan, args))
+
+	def insert_host_into_db(self, addr, hostname, time_of_scan):
 		""" insert a host into the database """
 		sql_statement = """insert or ignore into hosts (addr, hostname, scan_time) VALUES (?, ?, ?) """
 		self.cursor.execute(sql_statement, (addr, hostname, time_of_scan))
@@ -50,16 +58,19 @@ class nmap_xml_to_sqlite:
 		self.cursor.execute(sql_statement, (addr, serv_d["portid"], serv_d["product"], \
 			protocol, time_of_scan, serv_d["name"], serv_d["servicefp"], serv_d["version"] ))
 
-	def insert_scan_into_db(self):
+	def insert_all_scan_info_into_db(self):
 		"""
 			XXX: make this method cleaner!
 			insert every host that has open ports in the nmap xml file and
 			a description for it (the port) into the database
 		"""
 		self._doc = etree.parse(self.filename)
-		time_of_scan = ""
-		for x in self._doc.xpath("//nmaprun/@start"):
-			time_of_scan = datetime.datetime.fromtimestamp(float(x))
+		time_of_scan, args = "", ""
+		for x in self._doc.xpath("//nmaprun"):
+			time_of_scan = datetime.datetime.fromtimestamp(float(x.attrib['start']))
+			args = x.attrib['args']
+
+		self.insert_scan_into_db(time_of_scan, args)
 
 		for x in self._doc.xpath("//host"):
 			hostname = "" #this will be the value of the last hostname node's name element
@@ -99,7 +110,7 @@ def main():
 	s.create_store_dir()
 	s.connect_to_db()
 	s.create_db()
-	s.insert_scan_into_db()
+	s.insert_all_scan_info_into_db()
 	s.close_and_commit_to_db()
 
 if __name__ == "__main__":
