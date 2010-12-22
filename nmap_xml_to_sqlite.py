@@ -3,6 +3,8 @@ from lxml import etree
 import sqlite3
 import os
 import datetime
+from shows_hosts_with_open_port_and_service_desc import parse_opts
+
 
 __program__ = 'python_convert_nmap_xml_to_sqlite_db'
 ___author__ = 'dave b. <db@d1b.org>'
@@ -51,8 +53,8 @@ class nmap_xml_to_sqlite:
 	def insert_scan_into_db(self):
 		"""
 			XXX: make this method cleaner!
-			insert every host that has open ports in the nmap xml file and a
-			a description (for the port) into the database
+			insert every host that has open ports in the nmap xml file and
+			a description for it (the port) into the database
 		"""
 		self._doc = etree.parse(self.filename)
 		time_of_scan = ""
@@ -92,7 +94,8 @@ class nmap_xml_to_sqlite:
 		self.cursor.close()
 
 def main():
-	s = nmap_xml_to_sqlite("scan.xml")
+	filename = parse_opts()
+	s = nmap_xml_to_sqlite(filename)
 	s.create_store_dir()
 	s.connect_to_db()
 	s.create_db()
