@@ -91,13 +91,13 @@ class nmap_xml_to_sqlite:
 
 	def _service_wrap_attrib(self, child_attrib):
 		""" some fields are optional - so enter a blank value for a key if it doesn't exist  """
-		wraped_dict_result = {}
+		wrapped_dict_result = {}
 		for key in ["version", "product", "name", "servicefp"]:
 			if key in child_attrib.keys():
-				wraped_dict_result[key] = child_attrib[key]
+				wrapped_dict_result[key] = child_attrib[key]
 			else:
-				wraped_dict_result[key] = ""
-		return wraped_dict_result
+				wrapped_dict_result[key] = ""
+		return wrapped_dict_result
 
 	def close_and_commit_to_db(self):
 		""" commit to the database and close the cursor """
