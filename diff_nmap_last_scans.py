@@ -33,22 +33,26 @@ class nmap_sqlite_query:
 		data = [row for row in  self.cursor]
 		latest = str(data[1][0])
 		previous = str(data[0][0])
-		scan_result_latest = self.query_db_scan_results_for_time(latest)
-		scan_result_previous = self.query_db_scan_results_for_time(previous)
-		return  set(scan_result_latest).symmetric_difference(set(scan_result_previous))
+		scan_result_latest = set(self.query_db_scan_results_for_time(latest))
+		scan_result_previous = set(self.query_db_scan_results_for_time(previous))
+		return (scan_result_latest.difference(scan_result_previous), scan_result_previous.difference(scan_result_latest))
 
 	def query_db_scan_results_for_time(self, time):
 		sql_query = "select addr, name, product, version from open_port where strftime('%s', scan_time)=?"
 		self.cursor.execute(sql_query, (time,) )
 		return  [row for row in self.cursor]
 
+	def print_diff_of_scan(self, diff):
+		for i in diff[0]:
+			print "-", i
+		for i in diff[1]:
+			print "+", i
 
 def main():
 	s = nmap_sqlite_query()
 	s.connect_to_db()
 	diff = s.query_db_diff("1.%", "%-sV%")
-	for i in diff:
-		print i
+	s.print_diff_of_scan(diff)
 	s.close_and_commit_to_db()
 
 if __name__ == "__main__":
