@@ -81,6 +81,7 @@ class nmap_xml_to_sqlite:
 				hostname = host_n
 			for addr in x.xpath("address/@addr[@addrtype!='mac']"):
 				address = addr
+				break
 			self.insert_host_into_db(address, hostname, time_of_scan)
 
 			for open_p in x.xpath("ports/port[state[@state='open']]"):
