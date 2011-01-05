@@ -79,7 +79,7 @@ class nmap_xml_to_sqlite:
 			protocol = ""
 			for host_n in x.xpath("hostnames/hostname/@name"):
 				hostname = host_n
-			for addr in x.xpath("address/@addr"):
+			for addr in x.xpath("address/@addr[@addrtype!='mac']"):
 				address = addr
 			self.insert_host_into_db(address, hostname, time_of_scan)
 
