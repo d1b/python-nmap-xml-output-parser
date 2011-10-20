@@ -21,7 +21,7 @@ class nmap_xml_to_sqlite:
 	def create_store_dir(self):
 		""" create the store directory if it doesn't exist """
 		if not os.path.exists(self.store_p):
-			os.mkdir(self.store_p)
+			os.mkdir(self.store_p, 16832)
 
 	def connect_to_db(self):
 		""" connect to the database """
